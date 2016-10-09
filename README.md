@@ -10,5 +10,5 @@ Clonar el codigo, navegar hasta la carpeta raiz y ejecutar el siguiente comando
 npm install
 ```
 Abrir el navegador y escribir la direccion:
-http://localhost:3000
+[http://localhost:3000](http://localhost:3000)
 
