@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Microservicio</title>
+        <script rel="import" href="./bower_components/webcomponentsjs/webcomponents.js"></script>
+        <link rel="import" href="./bower_components/polymer/polymer.html">
+        <link rel="import" href="./bower_components/iron-ajax/iron-ajax.html">
+        <link rel="stylesheet" href="./stylesheet/style.css"/>
+    </head>
+    <body>
+        <dom-module id="service-module">
+            <template>
+                <h1>Monitor de servicio: MySQL</h1>
+                <p><b>Estatus:</b>&nbsp;<span>{{status}}</span></p>
+                <div>
+                    <button type="button" on-tap="reset" class="btn btn-2 btn-2d">Reinicar</button>
+                </div>
+                <iron-ajax id="ajax" url="http://localhost:3000/service" on-response="onResponse" handle-as="json"></iron-ajax>
+            </template>
+            <script>
+                Polymer({
+                    is: 'service-module',
+                    properties:{
+                        status: {
+                            type: String,
+                            value: 'Servicio inactivo'
+                        }
+                    },
+                    ready: function() {
+                        this.$.ajax.method = 'get';
+                        this.$.ajax.generateRequest();
+                        var self = this;
+                        setInterval(function(){
+                            self.status = 'Actualizando...';
+                            self.$.ajax.method = 'get';
+                            self.$.ajax.generateRequest();
+                        },60 * 1000);
+                    },
+                    /**
+                    * Funcion on Response
+                    * Para manejar las respuestas devueltas por el servidor
+                    */
+                    onResponse: function(e) {
+                        var response = this.$.ajax.lastResponse;
+                        this.status = response.message;
+                        if (!response.hasOwnProperty('fatal') && !response.status){
+                            this.reset();
+                        }
+                    },
+                    /**
+                    * Funcion Reset
+                    * Para reinicar el servicio si el mismo esta apagado
+                    */
+                    reset: function() {
+                        this.status = 'Reiniciando...';
+                        this.$.ajax.method = 'post';
+                        this.$.ajax.generateRequest();
+                    }
+                });
+            </script>
+        </dom-module>
+        <service-module></service-module>
+    </body>
+</html>
